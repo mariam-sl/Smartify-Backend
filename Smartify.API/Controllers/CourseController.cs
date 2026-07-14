@@ -25,12 +25,33 @@ namespace Smartify.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllCourses()
+        public async Task<IActionResult> GetPublishedCourses()
         {
+            var courses = await _courseService.GetPublishedCoursesAsync();
 
-            var courses = await _courseService.GetAllCoursesAsync();
             return Ok(courses);
         }
+
+        [HttpGet("instructor")]
+        [Authorize(Roles = $"{Roles.Instructor}")]
+        public async Task<IActionResult> GetInstructorCourses()
+        {
+            var userId = _currentUser.UserId!;
+
+            var courses =await _courseService.GetInstructorCoursesAsync(userId);
+
+            return Ok(courses);
+        }
+
+        [HttpGet("admin")]
+        [Authorize(Roles = $"{Roles.Admin}")]
+        public async Task<IActionResult> GetAllCourses()
+        {
+            var courses = await _courseService.GetAllCoursesAsync();
+
+            return Ok(courses);
+        }
+
 
         [HttpGet("{id}")]
         [AllowAnonymous]

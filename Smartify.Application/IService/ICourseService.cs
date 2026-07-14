@@ -10,6 +10,9 @@ namespace Smartify.Application.IService
     public interface ICourseService
     {
         Task<IEnumerable<CourseListItemDTO>> GetAllCoursesAsync();
+        Task<IEnumerable<CourseListItemDTO>> GetPublishedCoursesAsync();
+
+        Task<IEnumerable<CourseListItemDTO>> GetInstructorCoursesAsync(string instructorId);
 
         Task<CourseDetailsDTO?> GetCourseDetailsAsync(int courseId);
 

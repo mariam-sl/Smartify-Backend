@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Smartify.Application.Common;
 using Smartify.Application.DTO.Auth;
+using Smartify.Application.Exceptions;
 using Smartify.Application.IService;
 using Smartify.Domain.Constants;
 using Smartify.Infrastructure.Data;
@@ -80,7 +81,7 @@ namespace Smartify.Infrastructure.Services
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                throw new Exception("Invalid credentials");
+                throw new UnauthorizedException("Invalid email or password");
             var roles = await _userManager.GetRolesAsync(user);
 
             var tokenUser = new TokenUser

@@ -18,9 +18,28 @@ namespace Smartify.Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<IEnumerable<Course>> GetPublishedAsync()
+        {
+            return await _context.Courses
+                .Where(c => c.IsPublished)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Course>> GetByInstructorAsync(string instructorId)
+        {
+            return await _context.Courses
+                .Where(c => c.CreatedById == instructorId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
-            return await _context.Courses.AsNoTracking().ToListAsync();
+            return await _context.Courses
+                .AsNoTracking()
+                .ToListAsync();
         }
         public async Task<Course?> GetDetailedByIdAsync(int id)
         {

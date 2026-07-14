@@ -20,7 +20,16 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -111,6 +120,7 @@ builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 builder.Services.AddScoped<ILessonCompletionRepository, LessonCompletionRepository>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -133,7 +143,9 @@ using (var scope = app.Services.CreateScope())
         testUser = new ApplicationUser
         {
             UserName = "admin@test.com",
-            Email = "admin@test.com"
+            Email = "admin@test.com",
+            FullName = "System Administrator",
+            CreatedAt = DateTime.UtcNow
         };
 
         await userManager.CreateAsync(
@@ -154,6 +166,7 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -9,6 +9,8 @@ namespace Smartify.Application.IRepository
 {
     public interface ICourseRepository
     {
+        Task<IEnumerable<Course>> GetPublishedAsync();
+        Task<IEnumerable<Course>> GetByInstructorAsync(string instructorId);
         Task<IEnumerable<Course>> GetAllAsync();
         Task<Course?> GetDetailedByIdAsync(int id);
 

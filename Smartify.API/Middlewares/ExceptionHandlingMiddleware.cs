@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Smartify.Application.Exceptions;
+using System.Text.Json;
 
 namespace Smartify.API.Middlewares
 {
@@ -31,6 +32,8 @@ namespace Smartify.API.Middlewares
 
             int statusCode = exception switch
             {
+                UnauthorizedException  => StatusCodes.Status401Unauthorized,
+
                 UnauthorizedAccessException => StatusCodes.Status403Forbidden,
 
                 KeyNotFoundException => StatusCodes.Status404NotFound,
@@ -42,6 +45,7 @@ namespace Smartify.API.Middlewares
 
             string message = exception switch
             {
+                UnauthorizedException => exception.Message,
                 UnauthorizedAccessException => exception.Message,
 
                 KeyNotFoundException => exception.Message,

@@ -35,6 +35,36 @@ namespace Smartify.Application.Service
             });
         }
 
+        public async Task<IEnumerable<CourseListItemDTO>> GetPublishedCoursesAsync()
+        {
+            var courses = await _courseRepository.GetPublishedAsync();
+            return courses.Select(c => new CourseListItemDTO
+            {
+                Id = c.Id,
+                Title = c.Title,
+                ShortDescription = c.ShortDescription,
+                Difficulty = c.Difficulty,
+                Category = c.Category,
+                Thumbnail = c.Thumbnail,
+                IsPublished = c.IsPublished
+            });
+        }
+
+        public async Task<IEnumerable<CourseListItemDTO>> GetInstructorCoursesAsync(string instructorId)
+        {
+            var courses = await _courseRepository.GetByInstructorAsync(instructorId);
+            return courses.Select(c => new CourseListItemDTO
+            {
+                Id = c.Id,
+                Title = c.Title,
+                ShortDescription = c.ShortDescription,
+                Difficulty = c.Difficulty,
+                Category = c.Category,
+                Thumbnail = c.Thumbnail,
+                IsPublished = c.IsPublished
+            });
+        }
+
         public async Task<CourseDetailsDTO?> GetCourseDetailsAsync(int courseId)
         {
             var course = await _courseRepository.GetDetailedByIdAsync(courseId);
