@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Smartify.Application.DTO.Common;
 using Smartify.Application.DTO.User;
 using Smartify.Application.IService;
 using Smartify.Domain.Constants;
@@ -83,5 +85,78 @@ namespace Smartify.Infrastructure.Service
                    CreatedAt = i.CreatedAt
                });
         }
+
+        public async Task<PagedResult<UserListDTO>> GetUsersAsync(UserQueryParameters parameters)
+        {
+            var users = _userManager.Users.AsQueryable();
+
+            //search filter
+            if(!string.IsNullOrEmpty(parameters.Search))
+            {
+                users = users.Where( u =>
+                            u.FullName.Contains(parameters.Search)
+                                ||
+                            u.Email!.Contains(parameters.Search));
+            }
+
+            var usersList = await users.ToListAsync();
+            var result = new List<UserListDTO>();
+            foreach(var user in usersList)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var role = roles.FirstOrDefault();
+                if (!string.IsNullOrEmpty(parameters.Role) && role != parameters.Role)
+                {
+                    continue;
+                }
+
+                result.Add(new UserListDTO
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email!,
+                    Role = role ?? "",
+                    CreatedAt = user.CreatedAt
+                });
+            }
+
+            var totalCount = result.Count;
+
+
+            var pagedUsers = result
+                .Skip((parameters.Page - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+
+
+            return new PagedResult<UserListDTO>
+            {
+                Items = pagedUsers,
+                TotalCount = totalCount,
+                Page = parameters.Page,
+                PageSize = parameters.PageSize
+            };
+
+
+        }
+
+    
+
+    public async Task DeleteUserAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+
+            if (user == null)
+                throw new KeyNotFoundException("User not found");
+
+
+            var result = await _userManager.DeleteAsync(user);
+
+
+            if (!result.Succeeded)
+                throw new Exception("Failed to delete user");
+        }
+
     }
 }

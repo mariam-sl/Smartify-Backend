@@ -20,9 +20,9 @@ namespace Smartify.Application.Service
             _courseRepository = courseRepository;
         }
 
-        public async Task<IEnumerable<CourseListItemDTO>> GetAllCoursesAsync()
+        public async Task<IEnumerable<CourseListItemDTO>> GetAllCoursesAsync(CourseQueryParameters parameters)
         {
-            var courses = await _courseRepository.GetAllAsync();
+            var courses = await _courseRepository.GetCoursesAsync(parameters);
             return courses.Select(c => new CourseListItemDTO
             {
                 Id = c.Id,
@@ -50,9 +50,9 @@ namespace Smartify.Application.Service
             });
         }
 
-        public async Task<IEnumerable<CourseListItemDTO>> GetInstructorCoursesAsync(string instructorId)
+        public async Task<IEnumerable<CourseListItemDTO>> GetInstructorCoursesAsync(string instructorId,  CourseQueryParameters parameters)
         {
-            var courses = await _courseRepository.GetByInstructorAsync(instructorId);
+            var courses = await _courseRepository.GetCoursesAsync(parameters,instructorId);
             return courses.Select(c => new CourseListItemDTO
             {
                 Id = c.Id,

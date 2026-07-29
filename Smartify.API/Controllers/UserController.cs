@@ -30,8 +30,26 @@ namespace Smartify.API.Controllers
             return Ok(user);
         }
 
+        [HttpGet("/api/admin/users")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> GetUsers([FromQuery] UserQueryParameters parameters)
+        {
+            var users =await _userService.GetUsersAsync(parameters);
+
+            return Ok(users);
+        }
+
+        [HttpDelete("/api/admin/users/{id}")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            await _userService.DeleteUserAsync(id);
+
+            return NoContent();
+        }
 
 
+        //////////////////////////////////////////////
 
 
         [HttpPost("instructors")]

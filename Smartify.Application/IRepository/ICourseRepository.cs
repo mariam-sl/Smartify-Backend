@@ -1,4 +1,5 @@
-﻿using Smartify.Domain.Entities;
+﻿using Smartify.Application.DTO.Course;
+using Smartify.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace Smartify.Application.IRepository
         Task<IEnumerable<Course>> GetByInstructorAsync(string instructorId);
         Task<IEnumerable<Course>> GetAllAsync();
         Task<Course?> GetDetailedByIdAsync(int id);
+
+
+        Task<IEnumerable<Course>> GetCoursesAsync(CourseQueryParameters parameters,string? instructorId=null)
 
         //Task<IEnumerable<Course>> GetByIdsAsync(IEnumerable<int> ids);
         Task AddAsync(Course course);

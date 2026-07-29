@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Smartify.Application.DTO.Course;
 using Smartify.Application.IRepository;
 using Smartify.Domain.Entities;
 using Smartify.Infrastructure.Data;
@@ -40,7 +41,78 @@ namespace Smartify.Infrastructure.Repository
             return await _context.Courses
                 .AsNoTracking()
                 .ToListAsync();
+
         }
+
+        public async Task<IEnumerable<Course>> GetCoursesAsync(CourseQueryParameters parameters,string? instructorId = null)
+        {
+            IQueryable<Course> query = _context.Courses.AsNoTracking();
+
+            //instructor filter
+            if (!string.IsNullOrWhiteSpace(instructorId))
+            {
+                query = query.Where(c =>
+                    c.CreatedById == instructorId);
+            }
+
+
+            //search
+            if (!string.IsNullOrWhiteSpace(parameters.Search))
+            {
+                query = query.Where(c =>
+                    c.Title.Contains(parameters.Search) ||
+                    c.ShortDescription.Contains(parameters.Search));
+            }
+
+            //category
+            if (parameters.Category.HasValue)
+            {
+                query = query.Where(c =>
+                    c.Category == parameters.Category.Value);
+            }
+
+            //difficulty
+            if (parameters.Difficulty.HasValue)
+            {
+                query = query.Where(c =>
+                    c.Difficulty == parameters.Difficulty.Value);
+            }
+
+
+            //publish status
+            if (parameters.IsPublished.HasValue)
+            {
+                query = query.Where(c =>
+                    c.IsPublished == parameters.IsPublished.Value);
+            }
+
+            //sorting
+            bool descending = parameters.SortOrder?.ToLower() == "desc";
+
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "title" =>
+                    descending
+                        ? query.OrderByDescending(c => c.Title)
+                        : query.OrderBy(c => c.Title),
+
+                "difficulty" =>
+                    descending
+                        ? query.OrderByDescending(c => c.Difficulty)
+                        : query.OrderBy(c => c.Difficulty),
+
+                _ =>
+                    descending
+                        ? query.OrderByDescending(c => c.CreatedAt)
+                        : query.OrderBy(c => c.CreatedAt)
+            };
+
+            return await query.ToListAsync();
+
+
+        }
+
+
         public async Task<Course?> GetDetailedByIdAsync(int id)
         {
             return await _context.Courses
